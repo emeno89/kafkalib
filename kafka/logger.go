@@ -1,13 +1,13 @@
 package kafka
 
 type LogInfo struct {
-	Partition int32
-	Offset    int64
-	JsonMess  []byte
-	TopicList []string
-	HostList  []string
-	Key       string
-	GroupId   string
+	Partition int32    `json:"partition"`
+	Offset    int64    `json:"offset"`
+	JsonMess  []byte   `json:"jsonMess,omitempty"`
+	TopicList []string `json:"topicList,omitempty"`
+	HostList  []string `json:"hostList,omitempty"`
+	Key       string   `json:"key,omitempty"`
+	GroupId   string   `json:"groupId,omitempty"`
 }
 
 type Logger interface {
