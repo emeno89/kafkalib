@@ -79,6 +79,6 @@ func main() {
 }
 ````
 
-In the example above we create simple async producer and consumer. Producer sends message and are going to close, Consumer reads this message and receives cancel signal.
+In the example above we create simple async producer and consumer. Producer sends message and is going to close, Consumer reads this message and receives cancel signal.
 You can implement your own handler (for example - struct method).
 You can also send error from your handler and control processing of consumer using commitAfterFailure in Consume method. 
