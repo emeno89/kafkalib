@@ -25,10 +25,12 @@ func (p *producer) Produce(topic string, kafkaMessage Message, key string) (part
 		Key:   sarama.StringEncoder(key),
 	}
 
-	logInfo := LogInfo{
-		TopicList: []string{topic},
-		Key:       key,
-		JsonMess:  jsonMess,
+	logInfo := &OffsetInfo{
+		MainLogInfo: MainLogInfo{
+			TopicList: []string{topic},
+			Key:       key,
+			JsonMess:  string(jsonMess),
+		},
 		Partition: partition,
 		Offset:    offset,
 	}
@@ -44,7 +46,7 @@ func (p *producer) Produce(topic string, kafkaMessage Message, key string) (part
 }
 
 func (p *producer) Close() error {
-	logInfo := LogInfo{}
+	logInfo := &MainLogInfo{}
 
 	err := p.saramaProducer.Close()
 	if err != nil {
@@ -57,7 +59,7 @@ func (p *producer) Close() error {
 }
 
 func NewProducer(kafkaHostList []string, logger Logger) Producer {
-	logInfo := LogInfo{
+	logInfo := &MainLogInfo{
 		HostList: kafkaHostList,
 	}
 

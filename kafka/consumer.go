@@ -36,7 +36,7 @@ func (c *consumer) Consume(
 		commitAfterFailure: commitAfterFailure,
 	}
 
-	logInfo := LogInfo{
+	logInfo := &MainLogInfo{
 		GroupId:   c.groupId,
 		TopicList: topicList,
 	}
@@ -59,7 +59,7 @@ func (c *consumer) Consume(
 }
 
 func (c *consumer) Close() error {
-	logInfo := LogInfo{GroupId: c.groupId}
+	logInfo := &MainLogInfo{GroupId: c.groupId}
 
 	err := c.saramaConsumerGroup.Close()
 	if err != nil {
@@ -87,7 +87,7 @@ func NewConsumer(kafkaHostList []string, groupId string, startFrom int64, logger
 		config.Consumer.Offsets.Initial = startFrom
 	}
 
-	logInfo := LogInfo{
+	logInfo := &MainLogInfo{
 		HostList: kafkaHostList,
 		GroupId:  groupId,
 	}

@@ -18,7 +18,7 @@ type asyncProducer struct {
 }
 
 func NewAsyncProducer(kafkaHostList []string, waitCloseTime time.Duration, logger Logger) AsyncProducer {
-	logInfo := LogInfo{
+	logInfo := &MainLogInfo{
 		HostList: kafkaHostList,
 	}
 
@@ -55,8 +55,8 @@ func (p *asyncProducer) Produce(topic string, kafkaMessage Message, key string) 
 		Key:   sarama.StringEncoder(key),
 	}
 
-	logInfo := LogInfo{
-		JsonMess:  jsonMess,
+	logInfo := &MainLogInfo{
+		JsonMess:  string(jsonMess),
 		TopicList: []string{topic},
 		Key:       key,
 	}
@@ -65,17 +65,17 @@ func (p *asyncProducer) Produce(topic string, kafkaMessage Message, key string) 
 }
 
 func (p *asyncProducer) Close() error {
-	logInfo := LogInfo{}
+	logInfo := MainLogInfo{}
 
 	time.Sleep(p.waitCloseTime)
 
-	p.logger.Info("[async_producer] Close start", logInfo)
+	p.logger.Info("[async_producer] Close start", &logInfo)
 
 	err := p.saramaProducer.Close()
 	if err != nil {
-		p.logger.Error("[async_producer] Close err", err, logInfo)
+		p.logger.Error("[async_producer] Close err", err, &logInfo)
 	} else {
-		p.logger.Info("[async_producer] Close ok", logInfo)
+		p.logger.Info("[async_producer] Close ok", &logInfo)
 	}
 
 	return err
@@ -86,12 +86,14 @@ func (p *asyncProducer) readSuccesses() {
 		msg, _ := val.Value.Encode()
 		key, _ := val.Key.Encode()
 
-		logInfo := LogInfo{
-			JsonMess:  msg,
-			TopicList: []string{val.Topic},
+		logInfo := &OffsetInfo{
+			MainLogInfo: MainLogInfo{
+				JsonMess:  string(msg),
+				TopicList: []string{val.Topic},
+				Key:       string(key),
+			},
 			Partition: val.Partition,
 			Offset:    val.Offset,
-			Key:       string(key),
 		}
 
 		p.logger.Debug("[async_producer] Produce ok", logInfo)
@@ -104,12 +106,14 @@ func (p *asyncProducer) readErrors() {
 		msg, _ := val.Value.Encode()
 		key, _ := val.Key.Encode()
 
-		logInfo := LogInfo{
-			JsonMess:  msg,
-			TopicList: []string{val.Topic},
+		logInfo := &OffsetInfo{
+			MainLogInfo: MainLogInfo{
+				JsonMess:  string(msg),
+				TopicList: []string{val.Topic},
+				Key:       string(key),
+			},
 			Partition: val.Partition,
 			Offset:    val.Offset,
-			Key:       string(key),
 		}
 
 		p.logger.Error("[async_producer] Produce err", err, logInfo)

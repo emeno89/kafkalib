@@ -16,7 +16,7 @@ type consumerGroupHandler struct {
 }
 
 func (cgh *consumerGroupHandler) Setup(_ sarama.ConsumerGroupSession) error {
-	cgh.logger.Info("[consume_handler] Consume setup", LogInfo{GroupId: cgh.groupId})
+	cgh.logger.Info("[consume_handler] Consume setup", &MainLogInfo{GroupId: cgh.groupId})
 
 	return nil
 }
@@ -36,11 +36,13 @@ func (cgh *consumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, 
 func (cgh *consumerGroupHandler) runHandler(sess sarama.ConsumerGroupSession, msg *sarama.ConsumerMessage) {
 	ctx := sess.Context()
 
-	logInfo := LogInfo{
-		JsonMess:  msg.Value,
+	logInfo := &OffsetInfo{
+		MainLogInfo: MainLogInfo{
+			JsonMess: string(msg.Value),
+			GroupId:  cgh.groupId,
+		},
 		Partition: msg.Partition,
 		Offset:    msg.Offset,
-		GroupId:   cgh.groupId,
 	}
 
 	cgh.logger.Debug("[consume_handler] received", logInfo)
